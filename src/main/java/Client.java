@@ -15,12 +15,12 @@ public class Client {
     public void makePostRequest() throws Exception{
         // Set up the body data
         Img img=new Img();
-        img.setModality("CT");
+        img.setModality("MRI");
 
         Gson gson = new Gson();
         String jsonString = gson.toJson(img);
 
-        URL myURL = new URL("http://localhost:8080/DBServlet/search");
+        URL myURL = new URL("https://dbservlet.herokuapp.com/search");
         HttpURLConnection conn = (HttpURLConnection) myURL.openConnection();
 
         // Set up the header
@@ -30,7 +30,7 @@ public class Client {
 
         // Write the body of the request
         try(OutputStream os = conn.getOutputStream()) {
-            byte[] body = jsonString.getBytes("utf-8");
+            byte[] body = jsonString.getBytes(StandardCharsets.UTF_8);
             os.write(body, 0, body.length);
         }
 
