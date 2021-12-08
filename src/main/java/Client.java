@@ -1,6 +1,7 @@
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -12,15 +13,13 @@ public class Client {
 
     }
 
-    public void makePostRequest() throws Exception{
+    public Img[] search(SearchInfo searchInfo) throws Exception{
         // Set up the body data
-        Img img=new Img();
-        img.setModality("MRI");
-
         Gson gson = new Gson();
-        String jsonString = gson.toJson(img);
+        String jsonString = gson.toJson(searchInfo);
 
         URL myURL = new URL("https://dbservlet.herokuapp.com/search");
+        //URL myURL = new URL("http://localhost:8080/DBServlet/search");
         HttpURLConnection conn = (HttpURLConnection) myURL.openConnection();
 
         // Set up the header
@@ -40,9 +39,71 @@ public class Client {
         String resp;
         while ((resp = bufferedReader.readLine()) != null) {
             Gson gson2 = new Gson();
-            Img img2=gson2.fromJson(resp,Img.class);
-            System.out.println(img2.getUrl());
+            Img[] img_a=gson2.fromJson(resp,Img[].class);
+            for (Img img : img_a) {
+               System.out.println(img.getFile_name());
+            }
+            return img_a;
         }
         bufferedReader.close();
+        Img img=new Img();
+        Img[] img_a={img};
+        return img_a;
+    }
+
+    public InputStream thumbnail(String filename) throws Exception{
+        // Set up the body data
+        byte[] body = filename.getBytes(StandardCharsets.UTF_8);
+
+        URL myURL = new URL("https://dbservlet.herokuapp.com/thumbnail");
+        //URL myURL = new URL("http://localhost:8080/DBServlet/search");
+        HttpURLConnection conn = (HttpURLConnection) myURL.openConnection();
+
+        // Set up the header
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Accept", "text/html");
+        conn.setRequestProperty("charset", "utf-8");
+        conn.setRequestProperty("Content-Length", Integer.toString(body.length));
+        conn.setDoOutput(true);
+
+        // Write the body of the request
+        try (OutputStream outputStream = conn.getOutputStream()) {
+            outputStream.write(body, 0, body.length);
+        }
+
+        // Read the body of the response
+        InputStream file_stream=conn.getInputStream();
+        if (file_stream!=null) {
+            return file_stream;
+        }
+        return null;
+    }
+
+    public InputStream img(String filename) throws Exception{
+        // Set up the body data
+        byte[] body = filename.getBytes(StandardCharsets.UTF_8);
+
+        URL myURL = new URL("https://dbservlet.herokuapp.com/img");
+        //URL myURL = new URL("http://localhost:8080/DBServlet/search");
+        HttpURLConnection conn = (HttpURLConnection) myURL.openConnection();
+
+        // Set up the header
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Accept", "text/html");
+        conn.setRequestProperty("charset", "utf-8");
+        conn.setRequestProperty("Content-Length", Integer.toString(body.length));
+        conn.setDoOutput(true);
+
+        // Write the body of the request
+        try (OutputStream outputStream = conn.getOutputStream()) {
+            outputStream.write(body, 0, body.length);
+        }
+
+        // Read the body of the response
+        InputStream file_stream=conn.getInputStream();
+        if (file_stream!=null) {
+            return file_stream;
+        }
+        return null;
     }
 }
