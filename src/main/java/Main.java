@@ -1,6 +1,7 @@
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -19,15 +20,29 @@ public class Main {
             e.printStackTrace();
             img_a= new Img[]{};
         }
+        for (Img img : img_a) {
+            System.out.println(img.getFile_name());
 
-        if (img_a.length!=0) {
-            for (Img img : img_a) {
-                img.setThumbnail(cl.thumbnail(img.getFile_name()));
-            }
+            //for test
+            Image image = ImageIO.read(img.getThumbnail());
+            JFrame frame = new JFrame();
+            JLabel label = new JLabel(new ImageIcon(image));
+            frame.getContentPane().add(label, BorderLayout.CENTER);
+            frame.pack();
+            frame.setVisible(true);
         }
 
+        //click actionListener should set img_selected
         Img img_selected=new Img();
         img_selected.setFile_name("1.jpg");
-        InputStream img_stream=cl.img(img_selected.getFile_name());
+        InputStream img_stream=cl.getImg(img_selected);
+
+        //for test
+        Image image = ImageIO.read(img_stream);
+        JFrame frame = new JFrame();
+        JLabel label = new JLabel(new ImageIcon(image));
+        frame.getContentPane().add(label, BorderLayout.CENTER);
+        frame.pack();
+        frame.setVisible(true);
     }
 }

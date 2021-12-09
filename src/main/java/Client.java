@@ -41,17 +41,18 @@ public class Client {
             Gson gson2 = new Gson();
             Img[] img_a=gson2.fromJson(resp,Img[].class);
             for (Img img : img_a) {
-               System.out.println(img.getFile_name());
+                img.setThumbnail(getThumbnail(img));
             }
             return img_a;
         }
+
         bufferedReader.close();
         Img img=new Img();
         Img[] img_a={img};
         return img_a;
     }
-
-    public InputStream thumbnail(String filename) throws Exception{
+    /*
+    public InputStream getThumbnail(String filename) throws Exception{
         // Set up the body data
         byte[] body = filename.getBytes(StandardCharsets.UTF_8);
 
@@ -78,9 +79,39 @@ public class Client {
         }
         return null;
     }
-
-    public InputStream img(String filename) throws Exception{
+     */
+    public InputStream getThumbnail(Img img) throws Exception{
         // Set up the body data
+        String filename= img.getFile_name();
+        byte[] body = filename.getBytes(StandardCharsets.UTF_8);
+
+        URL myURL = new URL("https://dbservlet.herokuapp.com/thumbnail");
+        //URL myURL = new URL("http://localhost:8080/DBServlet/search");
+        HttpURLConnection conn = (HttpURLConnection) myURL.openConnection();
+
+        // Set up the header
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Accept", "text/html");
+        conn.setRequestProperty("charset", "utf-8");
+        conn.setRequestProperty("Content-Length", Integer.toString(body.length));
+        conn.setDoOutput(true);
+
+        // Write the body of the request
+        try (OutputStream outputStream = conn.getOutputStream()) {
+            outputStream.write(body, 0, body.length);
+        }
+
+        // Read the body of the response
+        InputStream file_stream=conn.getInputStream();
+        if (file_stream!=null) {
+            return file_stream;
+        }
+        return null;
+    }
+
+    public InputStream getImg(Img img) throws Exception{
+        // Set up the body data
+        String filename= img.getFile_name();
         byte[] body = filename.getBytes(StandardCharsets.UTF_8);
 
         URL myURL = new URL("https://dbservlet.herokuapp.com/img");
